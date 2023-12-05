@@ -3,6 +3,8 @@ import com.ipog.projetointegrador.model.Usuario;
 import com.ipog.projetointegrador.repository.UsuarioRepository;
 import com.ipog.projetointegrador.util.PasswordProvider;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +16,18 @@ public class UsuarioService {
     private UsuarioRepository usuarioRepository;
 
     // Cria um usuario
-    public Usuario createUsuario(Usuario usuario) {
-        return usuarioRepository.save(usuario);
+    public ResponseEntity<String> createUsuario(Usuario usuario) {
+        Optional<Usuario> searchUsuarioLogin = usuarioRepository.findByLogin(usuario.getLogin());
+        if(searchUsuarioLogin.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ja existe um usuario com este login, por favor, utilize um login unico.");
+        }
+
+        Optional<Usuario> searchUsuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
+        if(searchUsuarioEmail.isPresent()) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ja existe um usuario com este email, por favor, utilize um email unico.");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("Usuario criado com sucesso");
     }
 
     // Busca todos usuarios
