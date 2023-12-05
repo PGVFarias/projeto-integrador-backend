@@ -12,7 +12,7 @@ public class Grupo {
     private Long id;
 
     private String descricao;
-    @OneToMany(mappedBy = "documento")
+    @OneToMany(mappedBy = "grupo")
     private List<Documento> documentos;
 
     public Long getId() {

@@ -11,7 +11,7 @@ public class Documento {
 
     private String nome;
     private String nomeArmazenamento;
-    private Long idGrupo;
+
     @ManyToOne
     @JoinColumn(name = "idGrupo", referencedColumnName = "id")
     private Grupo grupo;
@@ -32,11 +32,11 @@ public class Documento {
         this.nomeArmazenamento = nomeArmazenamento;
     }
 
-    public Long getIdGrupo() {
-        return idGrupo;
+    public Grupo getGrupo() {
+        return grupo;
     }
 
-    public void setIdGrupo(Long idGrupo) {
-        this.idGrupo = idGrupo;
+    public void setGrupo(Grupo grupo) {
+        this.grupo = grupo;
     }
 }

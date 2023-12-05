@@ -25,7 +25,7 @@ public class DocumentoService {
             Documento existingDocumento = documento.get();
             existingDocumento.setNome(documentoDetails.getNome());
             existingDocumento.setNomeArmazenamento(documentoDetails.getNomeArmazenamento());
-            existingDocumento.setIdGrupo(documentoDetails.getIdGrupo());
+            existingDocumento.setGrupo(documentoDetails.getGrupo());
             return documentoRepository.save(existingDocumento);
         }
         return null;
