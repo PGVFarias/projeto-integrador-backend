@@ -41,7 +41,7 @@ public class UsuarioController {
     @DeleteMapping
     public String deleteAllUsuarios() {
         usuarioService.deleteAllUsuarios();
-        return "All usuarios have been deleted successfully.";
+        return "Todos usuarios deletados com sucesso.";
     }
 
     // Delete usuario by ID
