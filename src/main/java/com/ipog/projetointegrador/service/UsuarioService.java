@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -17,14 +18,16 @@ public class UsuarioService {
 
     // Cria um usuario
     public ResponseEntity<String> createUsuario(Usuario usuario) {
-        Optional<Usuario> searchUsuarioLogin = usuarioRepository.findByLogin(usuario.getLogin());
-        if(searchUsuarioLogin.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ja existe um usuario com este login, por favor, utilize um login unico.");
-        }
+        Optional<Usuario> searchUsuario = usuarioRepository.findByEmailOrLogin(usuario.getEmail(), usuario.getLogin());
 
-        Optional<Usuario> searchUsuarioEmail = usuarioRepository.findByEmail(usuario.getEmail());
-        if(searchUsuarioEmail.isPresent()) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("Ja existe um usuario com este email, por favor, utilize um email unico.");
+        if(searchUsuario.isPresent()) {
+            Usuario existingUsuario = searchUsuario.get();
+            if(Objects.equals(existingUsuario.getLogin(), usuario.getLogin())) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Ja existe um usuario com este login, por favor, utilize um login unico.");
+            }
+            if(Objects.equals(existingUsuario.getEmail(), usuario.getEmail())) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Ja existe um usuario com este email, por favor, utilize um email unico.");
+            }
         }
 
         return ResponseEntity.status(HttpStatus.OK).body("Usuario criado com sucesso");
@@ -46,15 +49,28 @@ public class UsuarioService {
     }
 
     // Atualiza usuario
-    public Usuario updateUsuario(Long id, Usuario usuarioDetails) {
+    public ResponseEntity<String> updateUsuario(Long id, Usuario usuarioDetails) {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
+        Optional<Usuario> searchUsuario = usuarioRepository.findByEmailOrLoginAndIdIsNot(usuarioDetails.getEmail(), usuarioDetails.getLogin(), id);
+
+        if(searchUsuario.isPresent()) {
+            Usuario conflictingUsuario = searchUsuario.get();
+           if(Objects.equals(conflictingUsuario.getLogin(), usuarioDetails.getLogin())) {
+               return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Ja existe um usuario com este login, por favor, utilize um login unico.");
+           }
+            if(Objects.equals(conflictingUsuario.getEmail(), usuarioDetails.getEmail())) {
+                return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body("Ja existe um usuario com este email, por favor, utilize um email unico.");
+            }
+        }
+
         if (usuario.isPresent()) {
             Usuario existingUsuario = usuario.get();
+
             existingUsuario.setLogin(usuarioDetails.getLogin());
             existingUsuario.setSenha(usuarioDetails.getSenha());
             existingUsuario.setStatus(usuarioDetails.getStatus());
             existingUsuario.setEmail(usuarioDetails.getEmail());
-            return usuarioRepository.save(existingUsuario);
+            return ResponseEntity.status(HttpStatus.OK).body("Usuario atualizado com sucesso");
         }
         return null;
     }
